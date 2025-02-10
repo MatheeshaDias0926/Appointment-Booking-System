@@ -1,62 +1,98 @@
 body {
   font-family: Arial, sans-serif;
   margin: 0;
-  padding: 20px;
+  padding: 0;
   background-color: #f4f4f4;
 }
 
 .app {
-  max-width: 800px;
+  padding: 20px;
+  max-width: 1200px;
   margin: 0 auto;
 }
 
-.calendar,
-.booking-form,
-.appointments-list {
+h1 {
+  text-align: center;
+  color: #333;
+}
+
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.calendar {
   background: #fff;
   padding: 20px;
-  margin-bottom: 20px;
   border-radius: 8px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-h1,
-h2 {
-  color: #333;
+.slots-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 10px;
 }
 
-ul {
-  list-style: none;
-  padding: 0;
-}
-
-li {
+.slot {
   padding: 10px;
-  border-bottom: 1px solid #ddd;
+  border: 1px solid #ddd;
+  border-radius: 4px;
   cursor: pointer;
+  text-align: center;
 }
 
-li:hover {
-  background-color: #f9f9f9;
+.slot:hover {
+  background-color: #f0f0f0;
+}
+
+.booking-form {
+  background: #fff;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.form-group {
+  margin-bottom: 15px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 5px;
+}
+
+.form-group input {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
 }
 
 button {
-  background-color: #ff4d4d;
-  color: white;
+  padding: 10px 20px;
+  background-color: #007bff;
+  color: #fff;
   border: none;
-  padding: 5px 10px;
   border-radius: 4px;
   cursor: pointer;
 }
 
 button:hover {
-  background-color: #cc0000;
+  background-color: #0056b3;
 }
 
-input {
-  width: 100%;
+.appointments-list {
+  background: #fff;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.appointment {
   padding: 10px;
-  margin-bottom: 10px;
   border: 1px solid #ddd;
   border-radius: 4px;
+  margin-bottom: 10px;
 }
