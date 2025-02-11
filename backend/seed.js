@@ -32,6 +32,21 @@ const seedSlots = async () => {
         endTime: new Date("2024-10-10T14:30:00"),
         isBooked: false,
       },
+      {
+        startTime: new Date("2024-10-10T15:00:00"),
+        endTime: new Date("2024-10-10T15:30:00"),
+        isBooked: false,
+      },
+      {
+        startTime: new Date("2024-10-10T16:00:00"),
+        endTime: new Date("2024-10-10T16:30:00"),
+        isBooked: false,
+      },
+      {
+        startTime: new Date("2024-10-10T17:00:00"),
+        endTime: new Date("2024-10-10T17:30:00"),
+        isBooked: false,
+      },
     ];
 
     await Slot.insertMany(slots);
