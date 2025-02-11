@@ -1,25 +1,23 @@
-import React, { useEffect, useState } from "react";
-import axios from "axios";
-import "../styles.css";
+import React from "react";
 
-const Calendar = ({ onSlotSelect }) => {
-  const [slots, setSlots] = useState([]);
-
-  useEffect(() => {
-    axios.get("/api/slots").then((response) => setSlots(response.data));
-  }, []);
-
+const Calendar = ({ slots, onSlotSelect }) => {
   return (
     <div className="calendar">
-      <h2>Available Slots</h2>
-      <ul>
+      <h2>Available Time Slots</h2>
+      <div className="slots-list">
         {slots.map((slot) => (
-          <li key={slot._id} onClick={() => onSlotSelect(slot)}>
-            {new Date(slot.startTime).toLocaleString()} -{" "}
-            {new Date(slot.endTime).toLocaleString()}
-          </li>
+          <div
+            key={slot._id}
+            className="slot"
+            onClick={() => onSlotSelect(slot)}
+          >
+            <p className="date">{new Date(slot.startTime).toDateString()}</p>
+            <p className="time">
+              {new Date(slot.startTime).toLocaleTimeString()}
+            </p>
+          </div>
         ))}
-      </ul>
+      </div>
     </div>
   );
 };

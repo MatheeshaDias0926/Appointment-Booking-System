@@ -1,38 +1,35 @@
-import React, { useEffect, useState } from "react";
-import axios from "axios";
-import "../styles.css";
+import React from "react";
+import Appointment from "./Appointment";
+import { motion } from "framer-motion"; // Animation library
 
-const AppointmentsList = () => {
-  const [appointments, setAppointments] = useState([]);
-
-  useEffect(() => {
-    axios
-      .get("/api/appointments")
-      .then((response) => setAppointments(response.data));
-  }, []);
-
-  const handleCancel = (id) => {
-    axios
-      .delete(`/api/appointments/${id}`)
-      .then(() => {
-        setAppointments(appointments.filter((app) => app._id !== id));
-        alert("Appointment canceled");
-      })
-      .catch(() => alert("Failed to cancel appointment"));
-  };
-
+const AppointmentsList = ({ appointments = [], onCancelAppointment }) => {
   return (
-    <div className="appointments-list">
-      <h2>Your Appointments</h2>
-      <ul>
-        {appointments.map((app) => (
-          <li key={app._id}>
-            {app.userName} - {new Date(app.slot.startTime).toLocaleString()}
-            <button onClick={() => handleCancel(app._id)}>Cancel</button>
-          </li>
-        ))}
-      </ul>
-    </div>
+    <motion.div
+      className="appointments-list"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.8 }}
+    >
+      <h2 className="appointments-title">Your Appointments</h2>
+
+      {appointments.length === 0 ? (
+        <p className="no-appointments">No appointments booked yet.</p>
+      ) : (
+        appointments.map((appt) => (
+          <motion.div
+            key={appt._id}
+            initial={{ x: -20 }}
+            animate={{ x: 0 }}
+            transition={{ type: "spring", stiffness: 100 }}
+          >
+            <Appointment
+              appointment={appt}
+              onCancelAppointment={() => onCancelAppointment(appt._id)} // ✅ Ensure function is correctly passed
+            />
+          </motion.div>
+        ))
+      )}
+    </motion.div>
   );
 };
 
