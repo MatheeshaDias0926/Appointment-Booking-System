@@ -9,6 +9,7 @@ const App = () => {
   const [slots, setSlots] = useState([]);
   const [appointments, setAppointments] = useState([]);
   const [selectedSlot, setSelectedSlot] = useState(null);
+  const [showPopup, setShowPopup] = useState(false);
 
   useEffect(() => {
     fetchSlots();
@@ -40,38 +41,61 @@ const App = () => {
       await axios.post("http://localhost:5000/api/appointments", bookingData);
       fetchSlots();
       fetchAppointments();
-      setSelectedSlot(null); // Reset selected slot after booking
+      setShowPopup(false);
+      setSelectedSlot(null);
     } catch (error) {
       console.error("Error booking appointment:", error);
     }
   };
 
-  const cancelAppointment = async (id) => {
+  // ✅ Define cancel function
+  const cancelAppointment = async (appointmentId) => {
     try {
-      await axios.delete(`http://localhost:5000/api/appointments/${id}`);
-      fetchSlots();
+      await axios.delete(
+        `http://localhost:5000/api/appointments/${appointmentId}`
+      );
       fetchAppointments();
     } catch (error) {
-      console.error("Error canceling appointment:", error);
+      console.error("Error cancelling appointment:", error);
     }
   };
 
   return (
     <div className="app">
-      <h1>Appointment Booking System</h1>
+      <br />
+      <h1 className="center-title">Appointment Booking System</h1>
+      <br />
       <div className="container">
-        <Calendar slots={slots} onSlotSelect={setSelectedSlot} />
-        {selectedSlot && (
-          <BookingForm
-            selectedSlot={selectedSlot}
-            onBookAppointment={bookAppointment}
+        <div className="left-panel">
+          <Calendar
+            slots={slots}
+            onSlotSelect={(slot) => {
+              setSelectedSlot(slot);
+              setShowPopup(true);
+            }}
           />
-        )}
-        <AppointmentsList
-          appointments={appointments}
-          onCancelAppointment={cancelAppointment}
-        />
+        </div>
+        <div className="right-panel">
+          {/* ✅ Pass cancel function to AppointmentsList */}
+          <AppointmentsList
+            appointments={appointments}
+            onCancelAppointment={cancelAppointment}
+          />
+        </div>
       </div>
+      {showPopup && (
+        <div className="popup-overlay">
+          <div className="popup-content">
+            <button className="close-btn" onClick={() => setShowPopup(false)}>
+              ✖
+            </button>
+            <BookingForm
+              selectedSlot={selectedSlot}
+              onBookAppointment={bookAppointment}
+            />
+          </div>
+        </div>
+      )}
     </div>
   );
 };

@@ -4,14 +4,17 @@ const Calendar = ({ slots, onSlotSelect }) => {
   return (
     <div className="calendar">
       <h2>Available Time Slots</h2>
-      <div className="slots-grid">
+      <div className="slots-list">
         {slots.map((slot) => (
           <div
             key={slot._id}
             className="slot"
             onClick={() => onSlotSelect(slot)}
           >
-            <p>{new Date(slot.startTime).toLocaleString()}</p>
+            <p className="date">{new Date(slot.startTime).toDateString()}</p>
+            <p className="time">
+              {new Date(slot.startTime).toLocaleTimeString()}
+            </p>
           </div>
         ))}
       </div>

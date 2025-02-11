@@ -4,10 +4,19 @@ const BookingForm = ({ selectedSlot, onBookAppointment }) => {
   const [userName, setUserName] = useState("");
   const [contact, setContact] = useState("");
 
+  const validatePhoneNumber = (number) => {
+    const regex = /^\+94\d{9}$/;
+    return regex.test(number);
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
     if (!userName || !contact) {
       alert("Please enter your name and contact information.");
+      return;
+    }
+    if (!validatePhoneNumber(contact)) {
+      alert("Invalid phone number! Use format: +94XXXXXXXXX");
       return;
     }
     onBookAppointment({ userName, contact, slotId: selectedSlot._id });
@@ -16,6 +25,13 @@ const BookingForm = ({ selectedSlot, onBookAppointment }) => {
   return (
     <div className="booking-form">
       <h2>Book Appointment</h2>
+      <p>
+        <strong>Date:</strong> {new Date(selectedSlot.startTime).toDateString()}
+      </p>
+      <p>
+        <strong>Time:</strong>{" "}
+        {new Date(selectedSlot.startTime).toLocaleTimeString()}
+      </p>
       <form onSubmit={handleSubmit}>
         <div className="form-group">
           <label>Name:</label>
