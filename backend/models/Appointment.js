@@ -1,12 +1,31 @@
-const mongoose = require("mongoose");
+const { DataTypes } = require("sequelize");
+const { sequelize } = require("../config/db");
+const Slot = require("./Slot");
 
-const appointmentSchema = new mongoose.Schema(
-  {
-    userName: { type: String, required: true },
-    contact: { type: String, required: true },
-    slot: { type: mongoose.Schema.Types.ObjectId, ref: "Slot", required: true },
+const Appointment = sequelize.define("Appointment", {
+  id: {
+    type: DataTypes.UUID,
+    defaultValue: DataTypes.UUIDV4,
+    primaryKey: true,
   },
-  { timestamps: true }
-);
+  userName: {
+    type: DataTypes.STRING,
+    allowNull: false,
+  },
+  contact: {
+    type: DataTypes.STRING,
+    allowNull: false,
+  },
+  slotId: {
+    type: DataTypes.UUID,
+    allowNull: false,
+    references: {
+      model: Slot,
+      key: "id",
+    },
+  },
+});
 
-module.exports = mongoose.model("Appointment", appointmentSchema);
+Appointment.belongsTo(Slot, { foreignKey: "slotId", onDelete: "CASCADE" });
+
+module.exports = Appointment;

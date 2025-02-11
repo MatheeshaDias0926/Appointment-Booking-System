@@ -2,7 +2,7 @@ const Slot = require("../models/Slot");
 
 exports.getSlots = async (req, res) => {
   try {
-    const slots = await Slot.find({ isBooked: false });
+    const slots = await Slot.findAll({ where: { isBooked: false } });
     res.json(slots);
   } catch (err) {
     console.error("Error fetching slots:", err);
@@ -10,7 +10,6 @@ exports.getSlots = async (req, res) => {
   }
 };
 
-// Admin: Create Available Slots
 exports.createSlots = async (req, res) => {
   const { date } = req.body;
 
@@ -21,7 +20,6 @@ exports.createSlots = async (req, res) => {
   try {
     const startHour = 9;
     const endHour = 17;
-
     const newSlots = [];
 
     for (let hour = startHour; hour < endHour; hour++) {
@@ -31,14 +29,14 @@ exports.createSlots = async (req, res) => {
       const endTime = new Date(startTime);
       endTime.setHours(hour + 1);
 
-      const existingSlot = await Slot.findOne({ startTime });
+      const existingSlot = await Slot.findOne({ where: { startTime } });
       if (!existingSlot) {
         newSlots.push({ startTime, endTime });
       }
     }
 
     if (newSlots.length > 0) {
-      await Slot.insertMany(newSlots);
+      await Slot.bulkCreate(newSlots);
     }
 
     res.status(201).json({ message: "Slots added successfully", newSlots });
@@ -48,10 +46,9 @@ exports.createSlots = async (req, res) => {
   }
 };
 
-// Admin: Get All Slots (Including Booked Ones)
 exports.getAllSlots = async (req, res) => {
   try {
-    const slots = await Slot.find();
+    const slots = await Slot.findAll();
     res.json(slots);
   } catch (err) {
     console.error("Error fetching slots:", err);
@@ -59,12 +56,16 @@ exports.getAllSlots = async (req, res) => {
   }
 };
 
-// Admin: Delete a Slot
 exports.deleteSlot = async (req, res) => {
   const { id } = req.params;
 
   try {
-    await Slot.findByIdAndDelete(id);
+    const slot = await Slot.findByPk(id);
+    if (!slot) {
+      return res.status(404).json({ message: "Slot not found" });
+    }
+
+    await slot.destroy();
     res.json({ message: "Slot deleted successfully" });
   } catch (err) {
     console.error("Error deleting slot:", err);

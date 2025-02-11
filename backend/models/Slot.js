@@ -1,12 +1,24 @@
-const mongoose = require("mongoose");
+const { DataTypes } = require("sequelize");
+const { sequelize } = require("../config/db");
 
-const slotSchema = new mongoose.Schema(
-  {
-    startTime: { type: Date, required: true },
-    endTime: { type: Date, required: true },
-    isBooked: { type: Boolean, default: false },
+const Slot = sequelize.define("Slot", {
+  id: {
+    type: DataTypes.UUID,
+    defaultValue: DataTypes.UUIDV4,
+    primaryKey: true,
   },
-  { timestamps: true }
-);
+  startTime: {
+    type: DataTypes.DATE,
+    allowNull: false,
+  },
+  endTime: {
+    type: DataTypes.DATE,
+    allowNull: false,
+  },
+  isBooked: {
+    type: DataTypes.BOOLEAN,
+    defaultValue: false,
+  },
+});
 
-module.exports = mongoose.model("Slot", slotSchema);
+module.exports = Slot;
