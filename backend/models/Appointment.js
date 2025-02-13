@@ -1,12 +1,20 @@
-const mongoose = require("mongoose");
+const { DataTypes } = require("sequelize");
+const { sequelize } = require("../config/db");
+const Slot = require("./Slot");
 
-const appointmentSchema = new mongoose.Schema(
-  {
-    userName: { type: String, required: true },
-    contact: { type: String, required: true },
-    slot: { type: mongoose.Schema.Types.ObjectId, ref: "Slot", required: true },
+const Appointment = sequelize.define("Appointment", {
+  userName: {
+    type: DataTypes.STRING,
+    allowNull: false,
   },
-  { timestamps: true }
-);
+  contact: {
+    type: DataTypes.STRING,
+    allowNull: false,
+  },
+});
 
-module.exports = mongoose.model("Appointment", appointmentSchema);
+// Define associations
+Appointment.belongsTo(Slot);
+Slot.hasMany(Appointment);
+
+module.exports = Appointment;

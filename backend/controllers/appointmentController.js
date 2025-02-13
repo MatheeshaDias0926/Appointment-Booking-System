@@ -1,28 +1,39 @@
-const Appointment = require("../models/Appointment");
-const Slot = require("../models/Slot");
-
+const { Appointment, Slot } = require("../models");
 exports.bookAppointment = async (req, res) => {
   const { userName, contact, slotId } = req.body;
 
-  // Input validation
   if (!userName || !contact || !slotId) {
     return res.status(400).json({ message: "All fields are required" });
   }
 
+  const transaction = await sequelize.transaction();
+
   try {
-    const slot = await Slot.findById(slotId);
+    const slot = await Slot.findByPk(slotId, { transaction });
+
     if (!slot || slot.isBooked) {
+      await transaction.rollback();
       return res.status(400).json({ message: "Slot not available" });
     }
 
-    const appointment = new Appointment({ userName, contact, slot: slotId });
-    await appointment.save();
+    const appointment = await Appointment.create(
+      {
+        userName,
+        contact,
+        SlotId: slotId,
+      },
+      { transaction }
+    );
 
-    slot.isBooked = true;
-    await slot.save();
+    await Slot.update(
+      { isBooked: true },
+      { where: { id: slotId }, transaction }
+    );
 
+    await transaction.commit();
     res.status(201).json(appointment);
   } catch (err) {
+    await transaction.rollback();
     console.error("Error booking appointment:", err);
     res.status(500).json({ message: "Server error" });
   }
@@ -30,7 +41,9 @@ exports.bookAppointment = async (req, res) => {
 
 exports.getAppointments = async (req, res) => {
   try {
-    const appointments = await Appointment.find().populate("slot");
+    const appointments = await Appointment.findAll({
+      include: [{ model: Slot }],
+    });
     res.json(appointments);
   } catch (err) {
     console.error("Error fetching appointments:", err);
@@ -40,21 +53,33 @@ exports.getAppointments = async (req, res) => {
 
 exports.cancelAppointment = async (req, res) => {
   const { id } = req.params;
+  const transaction = await sequelize.transaction();
 
   try {
-    const appointment = await Appointment.findByIdAndDelete(id).populate(
-      "slot"
-    );
+    const appointment = await Appointment.findByPk(id, {
+      include: [Slot],
+      transaction,
+    });
+
     if (!appointment) {
+      await transaction.rollback();
       return res.status(404).json({ message: "Appointment not found" });
     }
 
-    const slot = await Slot.findById(appointment.slot._id);
-    slot.isBooked = false;
-    await slot.save();
+    await Appointment.destroy({
+      where: { id },
+      transaction,
+    });
 
+    await Slot.update(
+      { isBooked: false },
+      { where: { id: appointment.Slot.id }, transaction }
+    );
+
+    await transaction.commit();
     res.json({ message: "Appointment canceled" });
   } catch (err) {
+    await transaction.rollback();
     console.error("Error canceling appointment:", err);
     res.status(500).json({ message: "Server error" });
   }
